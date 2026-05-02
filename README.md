@@ -51,6 +51,11 @@ python remove_bg_music.py video.mp4 -m htdemucs_ft
 - Processing time is roughly 1–3× the video duration on CPU
 - The video stream is copied without re-encoding
 
+## Legal
+This tool is intended for use with content you own or have the right to process.
+Downloading copyrighted YouTube videos without permission may violate YouTube's
+Terms of Service and applicable copyright law.
+
 ## License
 
 MIT
