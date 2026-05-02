@@ -1,0 +1,38 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Downloaded videos and audio (temp files)
+*.mp4
+*.wav
+*.mp3
+*.m4a
+
+# Demucs output folders
+demucs/
+htdemucs/
+htdemucs_ft/
+mdx_extra/
+mdx_extra_q/
+bgremove_temp/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Temp files
+*.tmp
+*.log
