@@ -80,10 +80,23 @@ def extract_audio(video_path: str, out_wav: str):
     ok("Audio extracted.")
 
 
-def run_demucs(audio_wav: str, out_dir: str, model: str) -> str:
-    info(f"Running Demucs ({model}) ...")
+def get_device() -> str:
+    try:
+        import torch
+        if torch.backends.mps.is_available():
+            return "mps"
+        if torch.cuda.is_available():
+            return "cuda"
+    except Exception:
+        pass
+    return "cpu"
 
-    cmd = [sys.executable, "-m", "demucs", "--out", out_dir, "--name", model]
+
+def run_demucs(audio_wav: str, out_dir: str, model: str) -> str:
+    device = get_device()
+    info(f"Running Demucs ({model}) on {device} ...")
+
+    cmd = [sys.executable, "-m", "demucs", "--out", out_dir, "--name", model, "--device", device]
 
     # --two-stems is faster and sufficient when we only need vocals
     if model.startswith("htdemucs"):
