@@ -43,14 +43,16 @@ def check_dependencies():
         sys.exit(1)
 
 
-def download_youtube(url: str, out_dir: str) -> str:
+def download_youtube(url: str, out_dir: str) -> tuple[str, str]:
     info("Downloading video ...")
     cmd = [
         "yt-dlp",
         "--format", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         "--merge-output-format", "mp4",
-        "--output", os.path.join(out_dir, "source.%(ext)s"),
+        "--output", os.path.join(out_dir, "%(title)s.%(ext)s"),
+        "--restrict-filenames",
         "--no-playlist",
+        "--print", "after_move:filepath",
         url,
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
@@ -58,12 +60,17 @@ def download_youtube(url: str, out_dir: str) -> str:
         error("yt-dlp failed:\n" + result.stderr)
         sys.exit(1)
 
-    for f in Path(out_dir).glob("source.*"):
-        ok(f"Downloaded → {f.name}")
-        return str(f)
+    filepath = result.stdout.strip().splitlines()[-1] if result.stdout.strip() else ""
+    if not filepath or not os.path.exists(filepath):
+        files = list(Path(out_dir).glob("*.mp4"))
+        if not files:
+            error("Download finished but no output file found.")
+            sys.exit(1)
+        filepath = str(files[0])
 
-    error("Download finished but no output file found.")
-    sys.exit(1)
+    title = Path(filepath).stem
+    ok(f"Downloaded → {Path(filepath).name}")
+    return filepath, title
 
 
 def extract_audio(video_path: str, out_wav: str):
@@ -161,16 +168,19 @@ def main():
 
     check_dependencies()
 
+    output_dir = Path("videos")
+    output_dir.mkdir(exist_ok=True)
+
     with tempfile.TemporaryDirectory(prefix="bgremove_") as tmp:
         if is_youtube_url(args.source):
-            video_path = download_youtube(args.source, tmp)
-            default_output = "clean_output.mp4"
+            video_path, title = download_youtube(args.source, tmp)
+            default_output = str(output_dir / f"{title}_clean.mp4")
         else:
             video_path = os.path.abspath(args.source)
             if not os.path.exists(video_path):
                 error(f"File not found: {video_path}")
                 sys.exit(1)
-            default_output = f"{Path(video_path).stem}_clean.mp4"
+            default_output = str(output_dir / f"{Path(video_path).stem}_clean.mp4")
 
         output_path = args.output or default_output
         audio_wav = os.path.join(tmp, "audio.wav")

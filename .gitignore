@@ -4,6 +4,7 @@ venv/
 env/
 
 # Downloaded videos and audio (temp files)
+videos/
 *.mp4
 *.wav
 *.mp3
