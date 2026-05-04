@@ -33,7 +33,9 @@ python remove_bg_music.py video.mp4 -o result.mp4
 # Higher quality model
 python remove_bg_music.py video.mp4 -m htdemucs_ft
 ```
+## Output
 
+Processed videos are saved to a `videos/` folder, named after the original video's title (e.g. `videos/My_Video_Title_clean.mp4`).
 ## Models
 
 | Model         | Quality | Speed  |
